@@ -1,0 +1,34 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: my-secret-pw
+      DB_NAME: ecommerce
+    depends_on:
+      - db
+    volumes:
+      - ./src:/app/src
+
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: ecommerce
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+networks:
+  app-network:
+    driver: bridge
+volumes:
+  db-data:
