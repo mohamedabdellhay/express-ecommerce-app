@@ -96,3 +96,7 @@ npm start
 "price": 19.99,
 "stock": 100
 ```
+- **Description:** Adds a new product to the database.
+- **Response:** The newly created product in JSON format.
+## License
+This project is open-source and available under the MIT License. See LICENSE.txt for details.
