@@ -41,3 +41,11 @@ To run this project locally, ensure you have the following installed:
    ```bash
    git clone https://github.com/your-username/ecommerce-app.git
    cd ecommerce-app
+   ```
+
+
+
+2. **Install dependencies**: If you plan to run the application without Docker:
+   ```bash
+    npm install
+   ```
