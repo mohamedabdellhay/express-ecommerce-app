@@ -39,12 +39,12 @@ To run this project locally, ensure you have the following installed:
 
 1. **Clone the repository**:
 ```bash
-    git clone https://github.com/your-username/ecommerce-app.git
-    cd ecommerce-app
+git clone https://github.com/your-username/ecommerce-app.git
+cd ecommerce-app
 ```
 2. **Install dependencies**: If you plan to run the application without Docker:
 ```bash
-    npm install
+npm install
 ```
 3. **Set up MySQL:**
 
@@ -52,10 +52,10 @@ To run this project locally, ensure you have the following installed:
 - The database will be created automatically when the app starts.
 - Create a .env file in the root of the project and configure the MySQL connection:
 ```bash
-    DB_HOST=db
-    DB_USER=root
-    DB_PASSWORD=my-secret-pw
-    DB_NAME=ecommerce
+DB_HOST=db
+DB_USER=root
+DB_PASSWORD=my-secret-pw
+DB_NAME=ecommerce
 ```
     This file contains the necessary credentials and connection details for MySQL.
 
@@ -71,7 +71,7 @@ docker-compose up --build
 
 3. **Stop the containers:** To stop the app and database containers:
 ```bash
-    docker-compose down
+docker-compose down
 ```
 ## Running Without Docker
 If you don't want to use Docker, you can run the application directly on your machine:
