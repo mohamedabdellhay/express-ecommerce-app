@@ -39,13 +39,63 @@ To run this project locally, ensure you have the following installed:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/ecommerce-app.git
-   cd ecommerce-app
+        git clone https://github.com/your-username/ecommerce-app.git
+        cd ecommerce-app
    ```
-
-
-
 2. **Install dependencies**: If you plan to run the application without Docker:
    ```bash
-    npm install
+        npm install
    ```
+3. **Set up MySQL:**
+
+    - Ensure MySQL is running (either via Docker or locally).
+    - The database will be created automatically when the app starts.
+    - Create a .env file in the root of the project and configure the MySQL connection:
+   ```bash
+        DB_HOST=db
+        DB_USER=root
+        DB_PASSWORD=my-secret-pw
+        DB_NAME=ecommerce
+   ```
+    This file contains the necessary credentials and connection details for MySQL.
+
+## Running with Docker
+1. **Build and start the application: With Docker Compose, you can easily start both the app and MySQL database in containers:**
+    ```bash
+    docker-compose up --build
+    ```
+
+2. **Access the application:**
+    - The Express app will be accessible at http://localhost:5000.
+    - MySQL will be running in the background inside a Docker container, available on port 3306.
+
+3. **Stop the containers:** To stop the app and database containers:
+    ```bash
+        docker-compose down
+    ```
+## Running Without Docker
+If you don't want to use Docker, you can run the application directly on your machine:
+1. **Start the server:**
+    ```bash
+    npm start
+    ```
+2. **Access the application: Open your browser and visit http://localhost:5000.**
+## Endpoints
+1. **Get All Products**
+
+- **URL:** http://localhost:5000/api/products
+- **Method:** GET
+- **Description:** Fetches all products from the database.
+- **Response:** A list of products in JSON format.
+2. **Add a New Product**
+- **URL:** /api/products
+- **Method:** POST
+- **Body**:
+    ```bash
+    
+    "name": "Product Name",
+    "description": "Product Description",
+    "price": 19.99,
+    "stock": 100
+    
+    ```
