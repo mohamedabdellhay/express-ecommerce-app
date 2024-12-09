@@ -83,19 +83,19 @@ If you don't want to use Docker, you can run the application directly on your ma
 ## Endpoints
 1. **Get All Products**
 
-- **URL:** http://localhost:5000/api/products
-- **Method:** GET
-- **Description:** Fetches all products from the database.
-- **Response:** A list of products in JSON format.
+    - **URL:** http://localhost:5000/api/products
+    - **Method:** GET
+    - **Description:** Fetches all products from the database.
+    - **Response:** A list of products in JSON format.
 2. **Add a New Product**
-- **URL:** /api/products
-- **Method:** POST
-- **Body**:
-    ```bash
-    
-    "name": "Product Name",
-    "description": "Product Description",
-    "price": 19.99,
-    "stock": 100
-    
-    ```
+    - **URL:** /api/products
+    - **Method:** POST
+    - **Body**:
+        ```bash
+        
+        "name": "Product Name",
+        "description": "Product Description",
+        "price": 19.99,
+        "stock": 100
+        
+        ```
