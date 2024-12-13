@@ -12,23 +12,27 @@ services:
       DB_PASSWORD: my-secret-pw
       DB_NAME: ecommerce
     depends_on:
-      - db
+      - postgres
     volumes:
       - ./src:/app/src
 
-  db:
-    image: mysql:8.0
-    container_name: mysql-db
+  postgres:
+    image: postgres
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: my-secret-pw
-      MYSQL_DATABASE: ecommerce
-    ports:
-      - "3306:3306"
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
     volumes:
-      - db-data:/var/lib/mysql
-networks:
-  app-network:
-    driver: bridge
+     - data-base:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: example
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+
 volumes:
-  db-data:
+  data-base:

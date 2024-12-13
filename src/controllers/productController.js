@@ -1,4 +1,4 @@
-const db = require("../config/db");
+const { db } = require("../config/db");
 
 const getProducts = (req, res) => {
   db.query("SELECT * FROM products", (err, results) => {
