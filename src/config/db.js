@@ -1,35 +1,22 @@
-const pgp = require("pg-promise")();
-const dotenv = require("dotenv");
-dotenv.config();
+const { Pool } = require("pg");
 
-const DB_PORT = process.env.DB_PORT || 5432;
-const DB_HOST = process.env.DB_HOST || "postgres";
-const DB_PASSWORD = process.env.DB_PASSWORD || "example";
-const DATABASE_NAME = process.env.DB_NAME || "ecommerce";
-const DB_USER = process.env.DB_USER || "postgres";
+// إنشاء اتصال مسبق باستخدام Pool
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+});
 
-const connectionOptions = {
-  host: DB_HOST,
-  port: DB_PORT,
-  database: DATABASE_NAME,
-  user: DB_USER,
-  password: DB_PASSWORD,
-};
+// Check database connection
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error("Error acquiring client", err.stack);
+  } else {
+    console.log("Connected to PostgreSQL");
+    release(); // return the client to pool
+  }
+});
 
-// Create the database connection
-const db = pgp(connectionOptions);
-
-// Test the connection
-db.connect()
-  .then((obj) => {
-    console.log("Connected to PostgreSQL database successfully!");
-    obj.done(); // Release the connection
-  })
-  .catch((error) => {
-    console.error("Error connecting to the database:", error);
-  });
-
-module.exports = {
-  db,
-  pgp,
-};
+module.exports = pool;
