@@ -1,5 +1,63 @@
 const pool = require("../config/db.js");
+const Ajv = require("ajv");
 const { checkIfProductExist } = require("../services/index.js");
+
+
+// validate data using AJV
+const ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
+const schema = {
+  type: "object",
+  properties: {
+    id: {
+      type: "string",
+      pattern: "^[0-9]+$",
+    },
+    ar_title: {
+      type: "string",
+      minLength: 1,
+    },
+    en_title: {
+      type: "string",
+      minLength: 1,
+    },
+    ar_description: {
+      type: "string",
+      minLength: 1,
+    },
+    en_description: {
+      type: "string",
+      minLength: 1,
+    },
+    price: {
+      type: "number",
+      minimum: 0,
+    },
+    images: {
+      type: "string",
+      minLength: 1,
+    },
+    parent_category: {
+      type: "string",
+      pattern: "^[0-9]+$",
+    },
+    stock:{
+      type: "number",
+      pattern: "^[0-9]+$",
+    }
+  },
+  required: ["ar_title", "en_title", "price", "parent_category", "stock"],
+  additionalProperties: false,
+};
+
+const validate = ajv.compile(schema);
+
+const data = {
+  foo: 1,
+  bar: "abc",
+};
+
+const valid = validate(data);
+if (!valid) console.log(validate.errors);
 
 const getProducts = async (req, res) => {
   try {
@@ -44,13 +102,35 @@ const getProduct = async (req, res) => {
 };
 
 const addProduct = async (req, res) => {
-  const { name, description, price, stock } = req.body;
+  const valid = validate(req.body);
+  if (!valid){
+    return res.status(403).json({
+      status: "403",
+      message: "Data must be valid please check your data!"
+    })
+  };
+  const {
+    ar_title,
+    en_title,
+    ar_description,
+    en_description,
+    price,
+    images,
+    parent_category,
+    stock
+  } = req.body;
+
+
 
   const query = `
-    INSERT INTO "products" ("name", "description", "price", "stock") 
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO "products" ("ar_title", "en_title", "ar_description", "en_description", "price", "images", "parent_category", "stock") 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING id`;
-  const values = [name, description, parseInt(stock, 10), parseInt(price, 10)];
+
+    
+  const values = [ar_title, en_title, ar_description, en_description, parseInt(price, 10), images, parent_category, parseInt(stock, 10)];
+
+
 
   try {
     // Execute query
@@ -60,7 +140,7 @@ const addProduct = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Product added successfully",
-      product: { id: result.insertId, name, price },
+      product: { id: result.insertId, en_title, price },
     });
   } catch (err) {
     // print error
