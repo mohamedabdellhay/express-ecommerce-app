@@ -24,13 +24,26 @@ const getCategories = async (req, res) => {
 };
 
 const addCategory = async (req, res) => {
-  const { parent_id, name, title, description, images } = req.body;
+  const { ar_title, en_title, ar_description, en_description, parent, images } =
+    req.body;
+  if (req.categoryExist) {
+    return res
+      .status(403)
+      .json({ status: "Rejected", message: "Category is already existed. 😐" }); // return a 404 status code
+  }
 
   const query = `
-    INSERT INTO "categories" ("parent_id", "name", "title", "description", "images") 
-    VALUES ($1, $2, $3, $4, $5)
+    INSERT INTO "categories" ("ar_title", "en_title", "ar_description", "en_description", "parent", "images")
+    VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING id`;
-  const values = [parent_id, name, title, description, images];
+  const values = [
+    ar_title,
+    en_title,
+    ar_description,
+    en_description,
+    parent,
+    images,
+  ];
 
   try {
     // Execute query
@@ -39,7 +52,7 @@ const addCategory = async (req, res) => {
     // send success message
     res.status(201).json({
       success: true,
-      message: `Category ${name} added successfully`,
+      message: `Category ${en_title} added successfully`,
     });
   } catch (err) {
     // print error
@@ -54,4 +67,34 @@ const addCategory = async (req, res) => {
   }
 };
 
-module.exports = { getCategories, addCategory };
+const deleteCategory = async (req, res) => {
+  const query = `UPDATE "categories" SET "deleted" = 't' WHERE "id" = $1`;
+  try {
+    await pool.query(query, [req.id]);
+    res.status(200).json({ status: "ok", message: "Category Deleted Success" });
+  } catch (err) {
+    res
+      .status(503)
+      .json({ status: "failed", message: `Error: ${err.message}` });
+  }
+  res.status(200).json({ message: "delete category page" });
+};
+
+const getCategory = async (req, res) => {
+  const { id, title } = req.params;
+  const query = `SELECT * FROM products WHERE category = $1`;
+  const { rowCount, rows: categoryProducts } = await pool.query(query, [id]);
+  if (rowCount === 0) {
+    return res
+      .status(404)
+      .json({ status: 404, message: `No Product Found in ${title} category` });
+  }
+  console.log(categoryProducts);
+  // console.log(id, title);
+  // res.json({ message: `get category ${title}` });
+
+  res
+    .status(200)
+    .json({ status: 200, count: rowCount, products: categoryProducts });
+};
+module.exports = { getCategories, addCategory, deleteCategory, getCategory };

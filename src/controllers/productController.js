@@ -2,7 +2,6 @@ const pool = require("../config/db.js");
 const Ajv = require("ajv");
 const { checkIfProductExist } = require("../services/index.js");
 
-
 // validate data using AJV
 const ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
 const schema = {
@@ -36,33 +35,27 @@ const schema = {
       type: "string",
       minLength: 1,
     },
-    parent_category: {
-      type: "string",
-      pattern: "^[0-9]+$",
-    },
-    stock:{
+    category: {
       type: "number",
       pattern: "^[0-9]+$",
-    }
+    },
+    stock: {
+      type: "number",
+      pattern: "^[0-9]+$",
+    },
+    deleted: {
+      type: "string",
+      minLength: 1,
+    },
   },
-  required: ["ar_title", "en_title", "price", "parent_category", "stock"],
+  required: ["ar_title", "en_title", "price", "category", "stock"],
   additionalProperties: false,
 };
 
-const validate = ajv.compile(schema);
-
-const data = {
-  foo: 1,
-  bar: "abc",
-};
-
-const valid = validate(data);
-if (!valid) console.log(validate.errors);
-
+// get all products from products table
 const getProducts = async (req, res) => {
   try {
     const products = await pool.query("SELECT * FROM products");
-
     if (products.rowCount > 0) {
       const result = {
         count: products.rowCount,
@@ -82,17 +75,12 @@ const getProducts = async (req, res) => {
   }
 };
 
+// get single product
 const getProduct = async (req, res) => {
   const { id } = req.params;
   try {
-    const product = await checkIfProductExist(id, res);
-    console.log(product);
-    res.json(product);
+    res.json(req.product);
   } catch (err) {
-    // print error
-    console.error("Error executing query:", err);
-
-    // send error message to user
     res.status(500).json({
       success: false,
       message: "Failed to get product",
@@ -101,14 +89,16 @@ const getProduct = async (req, res) => {
   }
 };
 
+// add new products
 const addProduct = async (req, res) => {
-  const valid = validate(req.body);
-  if (!valid){
+  const valid = ajv.validate(schema, req.body);
+  if (!valid) {
+    console.log(ajv.errors);
     return res.status(403).json({
       status: "403",
-      message: "Data must be valid please check your data!"
-    })
-  };
+      message: ajv.errors,
+    });
+  }
   const {
     ar_title,
     en_title,
@@ -116,21 +106,25 @@ const addProduct = async (req, res) => {
     en_description,
     price,
     images,
-    parent_category,
-    stock
+    category,
+    stock,
   } = req.body;
 
-
-
   const query = `
-    INSERT INTO "products" ("ar_title", "en_title", "ar_description", "en_description", "price", "images", "parent_category", "stock") 
+    INSERT INTO "products" ("ar_title", "en_title", "ar_description", "en_description", "price", "images", "category", "stock") 
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING id`;
 
-    
-  const values = [ar_title, en_title, ar_description, en_description, parseInt(price, 10), images, parent_category, parseInt(stock, 10)];
-
-
+  const values = [
+    ar_title,
+    en_title,
+    ar_description,
+    en_description,
+    parseInt(price, 10),
+    images,
+    category,
+    parseInt(stock, 10),
+  ];
 
   try {
     // Execute query
@@ -155,51 +149,84 @@ const addProduct = async (req, res) => {
   }
 };
 
+// Function to update an existing product
 const updateProduct = async (req, res) => {
-  const { id } = req.params;
-  const product = await checkIfProductExist(id, res);
-  const { name, description, price, stock } = req.body;
-
-  const query = ` UPDATE "products" SET "name" = $1, "description" = $2, "price" = $3, "stock" = $4 WHERE id = $5 RETURNING * `;
-  const values = [
-    name,
-    description,
-    parseInt(price, 10),
-    parseInt(stock, 10),
-    id,
-  ];
   try {
-    // Execute query
+    // Destructure request body with fallback to existing values
+    const product = req.product;
+    const {
+      id = product.id,
+      ar_title = product.ar_title,
+      en_title = product.en_title,
+      ar_description = product.ar_description,
+      en_description = product.en_description,
+      price = product.price,
+      images = product.images,
+      category = product.category,
+      stock = product.stock,
+      deleted = product.deleted,
+    } = req.body;
+
+    // Query and values for updating the product
+    const query = `
+      UPDATE products
+      SET 
+        ar_title = $1,
+        en_title = $2,
+        ar_description = $3,
+        en_description = $4,
+        price = $5,
+        images = $6,
+        category = $7,
+        stock = $8,
+        deleted = $9
+      WHERE id = $10
+      RETURNING *;
+    `;
+    const values = [
+      ar_title,
+      en_title,
+      ar_description,
+      en_description,
+      parseInt(price, 10),
+      images,
+      category,
+      parseInt(stock, 10),
+      deleted,
+      id,
+    ];
+
+    // Execute the query
     const result = await pool.query(query, values);
-    // send success message
+
+    // Send success response
     res.status(200).json({
       success: true,
       message: "Product updated successfully",
       product: result.rows[0],
     });
-  } catch (err) {
-    // print error
-    console.error("Error executing query:", err);
-    // send error message to user
+  } catch (error) {
+    // console.error("Error updating product:", error.message);
     res.status(500).json({
       success: false,
-      message: "Failed to update product",
-      error: err.message,
+      message: "An error occurred while updating the product",
+      error: error.message,
     });
   }
 };
 
+// Function to delete existing product
 const deleteProduct = async (req, res) => {
   const { id } = req.params;
   const product = await checkIfProductExist(id, res);
   console.log("product deleted ", id);
-  // UPDATE products SET deleted = 't' WHERE id = 3
-  //  DELETE FROM "products" WHERE id = $1 RETURNING *
+  if (!product)
+    return res.status(404).json({ message: "Product not found. 😐" }); // return a 404 status code
   const query = ` UPDATE products SET deleted = 't' WHERE id = $1 RETURNING * `;
   const values = [id];
   try {
     const result = await pool.query(query, values);
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Product deleted successfully",
       product: result.rows[0],
@@ -216,6 +243,7 @@ const deleteProduct = async (req, res) => {
   }
   res.json(product);
 };
+
 module.exports = {
   getProducts,
   getProduct,

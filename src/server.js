@@ -10,7 +10,10 @@ const categoryRoutes = require("./routes/v1/categoryRoutes.js");
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.all("*", (req, res, next) => {
+  console.log(req.body);
+  next();
+});
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 
