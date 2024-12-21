@@ -120,6 +120,47 @@ npm start
 - **Description:** Adds a new product to the database.
 - **Response:** The newly created product in JSON format.
 
+## Top Products API
+
+This section details how the Top Products functionality is implemented in the app. The goal is to fetch the top 5 most sold products by joining the `top_products` and `products` tables.
+
+### Query Description
+
+The API retrieves the following details for each product:
+
+- **Product ID** (`product_id`)
+- **Product Title** (`ar_title`, `en_title`)
+- **Price** (`price`)
+- **Product Images** (`images`)
+- **Category** (`category`)
+- **Stock** (`stock`)
+- **Sales Count** (`sales_count`)
+
+The query ensures that products marked as "deleted" are excluded by applying the condition `p.deleted IS NULL`.
+
+### SQL Query
+
+```sql
+SELECT
+  p.id AS product_id,
+  p.ar_title,
+  p.en_title,
+  p.price,
+  p.images,
+  p.category,
+  p.stock,
+  tp.sales_count
+FROM
+  products p
+JOIN
+  top_products tp ON p.id = tp.product_id
+WHERE
+  p.deleted IS NULL
+ORDER BY
+  tp.sales_count DESC
+LIMIT 5;
+
 ## License
 
 This project is open-source and available under the MIT License. See LICENSE.txt for details.
+```
