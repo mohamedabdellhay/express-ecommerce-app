@@ -5,6 +5,7 @@ const {
   addProduct,
   updateProduct,
   deleteProduct,
+  getTopProducts,
 } = require("../../controllers/productController");
 const { checkIfProductExist } = require("../../services");
 const router = express.Router();
@@ -25,6 +26,7 @@ router.param("id", async (req, res, next, val) => {
 });
 
 router.get("/", getProducts);
+router.get("/top", getTopProducts);
 router.get("/:id", getProduct);
 router.post("/", addProduct);
 router.put("/:id", updateProduct);

@@ -1,5 +1,8 @@
+require("dotenv").config();
 const pool = require("../config/db.js");
 const Ajv = require("ajv");
+const redis = require("redis");
+const { createClient } = require("redis");
 const { checkIfProductExist } = require("../services/index.js");
 
 // validate data using AJV
@@ -244,10 +247,72 @@ const deleteProduct = async (req, res) => {
   res.json(product);
 };
 
+// Function to get top products using redis caching
+const topProducts = async (req, res) => {
+  const query = `SELECT * FROM "products" WHERE "sales_count" != '0' ORDER BY "sales_count" DESC LIMIT 50`;
+  try {
+    const client = createClient({
+      url: `redis://redis:${process.env.REDIS_PORT}`,
+    });
+
+    await client.connect();
+
+    const cachedData = await client.get("topProducts");
+
+    if (cachedData) {
+      return res.json(JSON.parse(cachedData));
+    } else {
+      const { rows: products } = await pool.query(query);
+
+      await client.setEx("topProducts", 3600, JSON.stringify(products));
+
+      return res.json(products);
+    }
+  } catch (error) {
+    console.error("Error fetching top products:", error);
+    return res
+      .status(500)
+      .json({ message: "Error fetching top products", error });
+  } finally {
+    await client.quit();
+  }
+};
+
+// get top products from top products table
+const getTopProducts = async (req, res) => {
+  const query = `
+              SELECT
+              p.id AS product_id,
+              p.ar_title,
+              p.en_title,
+              p.price,
+              p.images,
+              p.category,
+              p.stock,
+              tp.sales_count
+            FROM
+              products p
+            JOIN
+              top_products tp ON p.id = tp.product_id
+            WHERE
+              p.deleted IS NULL
+            ORDER BY
+              tp.sales_count DESC
+            LIMIT 5;
+          `;
+  try {
+    const response = await pool.query(query);
+    res.json(response.rows);
+  } catch (error) {
+    console.error("Error executing query", error.stack);
+  }
+};
+
 module.exports = {
   getProducts,
   getProduct,
   addProduct,
   updateProduct,
   deleteProduct,
+  getTopProducts,
 };

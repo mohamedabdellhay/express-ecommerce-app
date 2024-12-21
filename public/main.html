@@ -1,0 +1,82 @@
+<html>
+<head>
+    <title>RESTful API - Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Welcome to the RESTful API</h1>
+        <p>This API allows you to perform CRUD operations on various resources. Below is a quick guide on how to use it:
+        </p>
+
+        <h2>Available Endpoints</h2>
+        <ul>
+            <li><strong>GET /api/items</strong> - Retrieve a list of items</li>
+            <li><strong>GET /api/items/:id</strong> - Retrieve a single item by ID</li>
+            <li><strong>POST /api/items</strong> - Create a new item (send JSON data in the body)</li>
+            <li><strong>PUT /api/items/:id</strong> - Update an item by ID (send JSON data in the body)</li>
+            <li><strong>DELETE /api/items/:id</strong> - Delete an item by ID</li>
+        </ul>
+
+        <h2>Example Request</h2>
+        <p>To get all items, make a GET request to:</p>
+        <pre>GET http://localhost:3000/api/items</pre>
+
+        <h2>Authentication</h2>
+        <p>If authentication is required, include the following header in your requests:</p>
+        <pre>Authorization: Bearer YOUR_TOKEN_HERE</pre>
+
+        <h2>Response Format</h2>
+        <p>The API responds with JSON. Example:</p>
+        <pre>{
+    "status": "success",
+    "data": {
+        "id": 1,
+        "name": "Sample Item",
+        "description": "This is a sample item."
+    }
+}</pre>
+
+        <p>For more information, visit the <a href="/docs">documentation</a>.</p>
+    </div>
+</body>
+
+</html>

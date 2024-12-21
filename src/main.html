@@ -1,0 +1,102 @@
+<html>
+<head>
+    <title>RESTful API - Home</title>
+    <style>
+        /* *{
+            margin: 0;
+            padding: 0;
+        } */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+        span{
+            font-size: 0.9rem;
+            font-weight: 300;
+            background: #f4f4f4;
+            padding: 3px 5px;
+            border-radius: 5px;
+            color: #ff0000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Welcome to the RESTful API</h1>
+        <p>This API allows you to perform CRUD operations on various resources. Below is a quick guide on how to use it:
+        </p>
+
+        <h2>Available Endpoints</h2>
+        
+        <ul>
+            <li><strong>GET <span>/api/v1/products</span></strong> - Retrieve a list of products</li>
+            <li><strong>GET <span>/api/v1/products/:id</span></strong> - Retrieve a single product by ID</li>
+            <li><strong>POST <span>/api/v1/products</span></strong> - Create a new product (send JSON data in the body)</li>
+            <li><strong>PUT <span>/api/v1/products/:id</span></strong> - Update an product by ID (send JSON data in the body)</li>
+            <li><strong>DELETE <span>/api/v1/products/:id</span></strong> - Delete an product by ID</li>
+            <hr style="padding: 0;transform: translateX(-16px)"/>
+            <li><strong>GET <span>/api/v1/categories</span></strong> - Retrieve a list of categories</li>
+            <li><strong>GET <span>/api/v1/categories/:id/:title</span></strong> - Retrieve a category products by ID</li>
+            <li><strong>POST <span>/api/v1/categories</span></strong> - Create a new category (send JSON data in the body)</li>
+            <li><strong>PUT <span>/api/v1/categories/:id</span></strong> - Update an category by ID (send JSON data in the body)
+            </li>
+            <li><strong>DELETE <span>/api/v1/category/:id</span></strong> - Delete an category by ID</li>
+        </ul>
+
+        <h2>Example Request</h2>
+        <p>To get all items, make a GET request to:</p>
+        <pre>GET http://localhost:5000/api/v1/products</pre>
+
+        <h2>Authentication</h2>
+        <!-- <p>If authentication is required, include the following header in your requests:</p> -->
+        <pre>Authorization: Bearer YOUR_TOKEN_HERE</pre>
+
+        <h2>Response Format</h2>
+        <p>The API responds with JSON. Example:</p>
+        <pre>{
+    "status": "success",
+    "data": {
+        "id": 1,
+        "name": "Sample Item",
+        "description": "This is a sample item."
+    }
+}</pre>
+
+        <p>For more information, visit the <a href="/docs">documentation</a>.</p>
+    </div>
+</body>
+
+</html>

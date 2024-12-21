@@ -1,5 +1,6 @@
 
 services:
+# application
   app:
     build:
       context: .
@@ -12,11 +13,14 @@ services:
       - DB_PASSWORD=example
       - DB_NAME=node_app_db
       - DB_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       - db
+      - redis
     volumes:
       - ./src:/app/src
-
+# database
   db:
     image: postgres
     restart: always
@@ -35,6 +39,18 @@ services:
     ports:
       - 8080:8080
 
+  # redis cache
+  redis:
+      image: redis:alpine
+      restart: always
+      ports:
+        - '6379:6379'
+      volumes: 
+        - redis:/data
+
+  
 
 volumes:
   data-base:
+  redis:
+    driver: local
