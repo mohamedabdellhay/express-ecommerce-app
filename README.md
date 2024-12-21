@@ -159,8 +159,8 @@ WHERE
 ORDER BY
   tp.sales_count DESC
 LIMIT 5;
+```
 
 ## License
 
 This project is open-source and available under the MIT License. See LICENSE.txt for details.
-```
